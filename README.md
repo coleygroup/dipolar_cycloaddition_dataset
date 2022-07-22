@@ -14,7 +14,7 @@ This repository contains the code and auxiliary data associated to the 1,3-dipol
 9. pip 2.22
 10. rdchiral 1.1
 
-Additionally, in order to execute the autodE high-throughput reaction profile computation workflow, Gaussian09/Gaussian16 needs to be accessible.
+Additionally, in order to execute the autodE high-throughput reaction profile computation workflow, Gaussian09/Gaussian16 needs to be accessible. More information about the autodE module can be found [here](https://github.com/duartegroup/autodE).
 
 ### Conda environment
 To set up the conda environment:
@@ -60,4 +60,22 @@ This script will copy all final .xyz files as well as the `energies.csv` to a ne
 
 ## References
 
-If (parts of) this workflow 
+If (parts of) this workflow are used as part of a publication please cite the associated paper:
+
+xxx
+
+Additionally, since the workflow makes heavy use of autodE, please also cite the paper in which this code was originally presented:
+```
+@article{autodE,
+  doi = {10.1002/anie.202011941},
+  url = {https://doi.org/10.1002/anie.202011941},
+  year = {2021},
+  publisher = {Wiley},
+  volume = {60},
+  number = {8},
+  pages = {4266--4274},
+  author = {Tom A. Young and Joseph J. Silcock and Alistair J. Sterling and Fernanda Duarte},
+  title = {{autodE}: Automated Calculation of Reaction Energy Profiles -- Application to Organic and Organometallic Reactions},
+  journal = {Angewandte Chemie International Edition}
+}
+```
