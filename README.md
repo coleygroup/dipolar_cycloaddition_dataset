@@ -58,6 +58,10 @@ python extract_output.py --data_file <path to the input .csv file> --output_fold
 
 This script will copy all final .xyz files as well as the `energies.csv` to a new directory (`xyz_folder_<output_folder>`). Additionally, it creates a .csv file containing the successfully computed reaction SMILES together with the activition energies/enthalpies/free energies as well as the reaction energies/enthalpies/free energies (`output_<output_folder>.csv`).
 
+## Post-processing reaction SMILES to ensure stereo-compatibility of the dipoles
+
+xxx
+
 ## References
 
 If (parts of) this workflow are used as part of a publication please cite the associated paper:
