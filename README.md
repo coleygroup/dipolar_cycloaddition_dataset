@@ -1,5 +1,5 @@
 # dipolar_cycloaddition_dataset
-The repository contains the code and auxiliary data associated to the 1,3-dipolar cycloaddition reaction dataset construction project.
+This repository contains the code and auxiliary data associated to the 1,3-dipolar cycloaddition reaction dataset construction project.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ conda env create --name <env-name> --file environment.yml
 
 ## Generating the search space and reaction SMILES
 
-The Jupyter notebooks used to generate the search space for both dipoles and dipolarophiles is included in the `dataset_construction` directory. The full list of generated species and the extracted samples can be found in the `full_list_dipoles_dipolarophiles` and `sample_list` sub-directories respectively. The `dataset_construction` directory furthermore contains Python scripts to combine dipoles and dipolarophiles into valid reaction SMILES. The first script generates reaction SMILES for the synthetic and biofragment-based dipolarophiles separately:
+The Jupyter notebooks used to generate the search space for both dipoles and dipolarophiles are included in the `dataset_construction` directory. The full list of generated species and the extracted samples can be found in the `full_list_dipoles_dipolarophiles` and `sample_list` sub-directories respectively. The `dataset_construction` directory furthermore contains Python scripts to combine dipoles and dipolarophiles into valid reaction SMILES. The first script generates reaction SMILES for the synthetic and biofragment-based dipolarophiles separately:
 ```
 python construct_dataset_finalized.py
 ```
@@ -37,4 +37,9 @@ python construct_dataset_azides_finalized.py
 The outputted `.csv` file used in the automated workflow is also included in the `final_datasets` sub-directory 
 
 ## High-throughput reaction profile computation
+
+Input files for high-throughput reaction profile computations can be generated with the help of the `initialize.py` script in the `high_throughput_reaction_profiles` directory as follows:
+```
+python initialize.py --data_file <path to the .csv file containing the reaction SMILES> --num_input_files <total number of files to be generated> --n_cores <number of cores per computation> --autodE_folder <name of the autodE folder to be generated> [--DFT_theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free_energy]
+```
 
