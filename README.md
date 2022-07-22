@@ -44,7 +44,9 @@ Input files for high-throughput reaction profile computations, based on the reac
 ```
 python initialize.py --data_file <path to the input .csv file> --num_input_files <total number of files to be generated> --autodE_folder <name of the autodE folder to be generated> [--n_cores <number of cores per computation>] [--DFT_theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free_energy] [--complexes]
 ```
-The script batches up the reaction SMILES in individual Python submission scripts (the number of files can be defined in the `num_input_files` command line option) and places them in the `autodE_folder`. Additionally, the script generates sub-directories for each individual reaction SMILES in the `autodE_folder` (the sub-directories are numbered based on the indices in the input file). By default, 4 cores are used per computation, no free energy corrections nor complexes are computed and the PBE0/def2svp/def2tzvp/EmpiricalDispersion=GD3BJ level of theory is used. These default options can be adjusted with the help of the corresponding flags.
+The script batches up the reaction SMILES in individual Python files, each containing a linear sequence of autodE reaction profile computations, and places them in the `autodE_folder` (the number of files can be defined in the `num_input_files` command line option). Additionally, the script generates sub-directories for each individual reaction SMILES in the `autodE_folder` (the sub-directories are numbered based on the indices in the input file). By default, 4 cores are used per computation, no free energy corrections nor complexes are computed and the PBE0/def2svp/def2tzvp/EmpiricalDispersion=GD3BJ level of theory is used. These default options can be adjusted with the help of the corresponding flags.
+
+Once the input files have been generated, they can be executed with the help of a job array ([with triples](https://supercloud.mit.edu/job-arrays-llsub-triples-3-steps).
 
 To resume an interrupted workflow, a re-initialization can be performed which will generate new input files (with an 'r' prefix) containing only the autodE  computations which haven't been run yet:
 ```
