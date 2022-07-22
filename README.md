@@ -1,5 +1,5 @@
 # dipolar_cycloaddition_dataset
-This repository contains the code and auxiliary data associated to the 1,3-dipolar cycloaddition reaction dataset construction project.
+This repository contains the code and auxiliary data associated to the 1,3-dipolar cycloaddition reaction dataset construction project. Code is provided "as-is." Minor edits may be required to tailor scripts for different computational systems.
 
 ## Requirements
 
