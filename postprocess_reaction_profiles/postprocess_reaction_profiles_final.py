@@ -30,11 +30,11 @@ def parse_coordinates(lines):
     return np.array(coordinates)
 
 
-def extract_ts_geometry(r_smiles, p_smiles, rxn_id, home_dir, geom_file='xyz_ultimate9/'):
+def extract_ts_geometry(r_smiles, p_smiles, rxn_id, home_dir, work_dir, geom_file='xyz_ultimate9/'):
     ''' Wrapper around the TSGeomExtractor object (can take care of potential failures etc.) '''
     os.chdir(home_dir)
     geom_path = os.path.join(home_dir, geom_file)
-    return TSGeomExtractor(r_smiles, p_smiles, rxn_id, home_dir, geom_path)
+    return TSGeomExtractor(r_smiles, p_smiles, rxn_id, work_dir, geom_path)
 
 
 def remove_atom_map_nums(smiles):
@@ -272,7 +272,7 @@ class TSGeomExtractor:
             self._ts_mol_ordering = get_ordering(self.ts_mol, self._ts_mol_unmapped)
             self._map_num_dict = get_map_num_dict(self.p_smiles)
             self._retained_lines = self.extract_lines_from_ts_xyz(geom_path)
-            self._reactive_xyz_path = os.path.join(self.work_dir, f'xtb_trash/{self.rxn_id}/reactive_dipole_geom_{self.rxn_id}.xyz')
+            self._reactive_xyz_path = os.path.join(self.work_dir, f'reactive_dipole_geom_{self.rxn_id}.xyz')
 
             # optimize and store dihedral angles to track
             self.write_xyz()
@@ -424,7 +424,7 @@ def get_compatible_conformer(input_tuple):
     ''' Generate a stereo-compatible conformer for the dipole '''
     # extract all info necessary to perform 
     dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir = input_tuple
-    geometry_extractor = extract_ts_geometry(dipole_smiles, product_smiles, rxn_id, tmp_dir)
+    geometry_extractor = extract_ts_geometry(dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir)
 
     if not geometry_extractor.continue_workflow:
         return dipole_smiles, rxn_id, None, None, None
