@@ -156,16 +156,17 @@ def extract_output(main_path, idx):
             csv_reader = csv.reader(csv_file)
             reaction_data = [row for row in csv_reader]
             for row in reaction_data[2:]:
-                if row[0].startswith('r0'):
+                if row[0].startswith('r0') and not row[0].endswith('_alt'):
                     r0_energy_array = extract_energies(row)
-                elif row[0].startswith('r1'):
+                elif row[0].startswith('r1') and not row[0].endswith('_alt'):
                     r1_energy_array = extract_energies(row)
-                elif row[0].startswith('p'):
+                elif row[0].startswith('p0'):
                     product_energy_array = extract_energies(row)
-                elif row[0].startswith('T'):
+                elif row[0].startswith('TS'):
                     ts_energy_array = extract_energies(row)
-                elif row[0].endwith('_alt'):
+                elif row[0].endswith('_alt'):
                     r_alt_energy_array = extract_energies(row)
+                    r_alt_name = row[0]
         
         if r_alt_name is not None:
             if r_alt_name.startswith('r0'):

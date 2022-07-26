@@ -3,9 +3,9 @@ import os
 import csv
 import pandas as pd
 import shutil
+import numpy as np
 
 hartree = 627.5094740631
-
 
 parser = ArgumentParser()
 parser.add_argument(
@@ -39,124 +39,99 @@ def get_rxn_smiles_and_targets(filename):
     return df
 
 
-def extract_energies(row, energy, enthalpy, free_energy):
+def extract_energies(row):
     ''' Extract energies from a single line in an energies.csv-file '''
-    energy += float(row[-1])
+    energy = float(row[-1])
     try:
-        enthalpy += float(row[-1]) + float(row[-2])
-        free_energy += float(row[-1]) + float(row[-3])
+        enthalpy = float(row[-1]) + float(row[-2])
+        free_energy = float(row[-1]) + float(row[-3])
     except Exception:
-        return energy, None, None
+        return np.array([energy, None, None])
 
-    return energy, enthalpy, free_energy
+    return np.array([energy, enthalpy, free_energy])
 
 
 def extract_output(idx, complexes: bool = False):
     ''' Extract and process energy values for each of the species associated with a reaction '''
-    reactants_energy, products_energy = 0, 0
-    reactants_enthalpy, products_enthalpy = 0, 0
-    reactants_free_energy, products_free_energy = 0, 0
+    r_alt_name = None
 
     path = os.path.join(os.getcwd(), str(idx))
     file = os.path.join(path, "output/energies.csv")
     if not os.path.isfile(file):
         path = os.path.join(os.getcwd(), f"r{str(idx)}")
-        file = os.path.join(path, "output/energies.csv")
+        file = os.path.join(path, "output/energies.csv") 
 
     try:
         with open(file, "r") as csv_file:
             csv_reader = csv.reader(csv_file)
             reaction_data = [row for row in csv_reader]
             for row in reaction_data[2:]:
-                if row[0][0] == "r":
-                    (
-                        reactants_energy,
-                        reactants_enthalpy,
-                        reactants_free_energy,
-                    ) = extract_energies(
-                        row, reactants_energy, reactants_enthalpy, reactants_free_energy
-                    )
-                elif row[0][0] == "p":
-                    (
-                        products_energy,
-                        products_enthalpy,
-                        products_free_energy,
-                    ) = extract_energies(
-                        row, products_energy, products_enthalpy, products_free_energy
-                    )
-                elif row[0][0] == "T":
-                    ts_energy, ts_enthalpy, ts_free_energy = extract_energies(
-                        row, 0, 0, 0
-                    )
+                if row[0].startswith('r0'):
+                    r0_energy_array = extract_energies(row)
+                elif row[0].startswith('r1'):
+                    r1_energy_array = extract_energies(row)
+                elif row[0].startswith('p0'):
+                    product_energy_array = extract_energies(row)
+                elif row[0].startswith('TS'):
+                    ts_energy_array = extract_energies(row)
+                elif row[0].endswith('_alt'):
+                    r_alt_energy_array = extract_energies(row)
                 elif row[0].endswith("_reactant"):
-                    (
-                        r_complex_energy,
-                        r_complex_enthalpy,
-                        r_complex_free_energy,
-                    ) = extract_energies(row, 0, 0, 0)
+                    r_complex_energy_array = extract_energies(row)
                 elif row[0].endswith("_product"):
-                    _, _, p_complex_free_energy = extract_energies(row, 0, 0, 0)
+                    p_complex_energy_array = extract_energies(row)
 
-        E_r = (products_energy - reactants_energy) * hartree
-        H_r = (products_enthalpy - reactants_enthalpy) * hartree
-        G_r = (products_free_energy - reactants_free_energy) * hartree
+        if r_alt_name is not None:
+            if r_alt_name.startswith('r0'):
+                reactant_energy_array = r_alt_energy_array + r1_energy_array
+            elif r_alt_name.startswith('r1'):
+                reactant_energy_array = r_alt_energy_array + r0_energy_array
+        else:
+            reactant_energy_array = r0_energy_array + r1_energy_array
+
+        reaction_energy_array = (product_energy_array - reactant_energy_array) * hartree
 
         try:
-            E_act = (ts_energy - reactants_energy) * hartree
-            H_act = (ts_enthalpy - reactants_enthalpy) * hartree
-            G_act = (ts_free_energy - reactants_free_energy) * hartree
+            activation_energy_array = (ts_energy_array - reactant_energy_array) * hartree
         except UnboundLocalError:
             print(f"No Barrier found for {idx}!")
-            E_act, H_act, G_act = None, None, None
+            activation_energy_array = np.array([None, None, None])
 
         if complexes:
-            E_complexation = (r_complex_energy - reactants_energy) * hartree
-            H_complexation = (r_complex_enthalpy - reactants_enthalpy) * hartree
-            G_complexation = (r_complex_free_energy - reactants_free_energy) * hartree
+            complexation_energy_array = (r_complex_energy_array - reactant_energy_array) * hartree
 
-            G_r_complexes = (p_complex_free_energy - r_complex_free_energy) * hartree
+            G_r_complexes = (p_complex_energy_array[-1] - r_complex_energy_array[-1]) * hartree
             try:
-                G_act_complexes = (ts_free_energy - r_complex_free_energy) * hartree
+                G_act_complexes = (ts_energy_array[-1] - r_complex_energy_array[-1]) * hartree
             except UnboundLocalError:
                 G_act_complexes = None
 
-        print(f"Barrier found for {idx}")
-
-    except:
+    except Exception:
         print(f"File for {idx} does not exist!")
         if complexes:
             (
-                E_r,
-                E_act,
-                H_r,
-                H_act,
-                G_r,
-                G_act,
-                E_complexation,
-                H_complexation,
-                G_complexation,
+                reaction_energy_array, 
+                activation_energy_array, 
+                complexation_energy_array,
                 G_r_complexes,
                 G_act_complexes,
-            ) = (None, None, None, None, None, None, None, None, None, None, None)
+            ) = (np.array([None, None, None]), np.array([None, None, None]), np.array([None, None, None]), None, None)
         else:
-            E_r, E_act, H_r, H_act, G_r, G_act = None, None, None, None, None, None
+            reaction_energy_array, activation_energy_array = np.array([None, None, None]), np.array([None, None, None])
+
+    if None not in activation_energy_array:
+        print(f"Reaction profile found for {idx}!")
 
     if complexes:
         return [
-            E_r,
-            E_act,
-            H_r,
-            H_act,
-            G_r,
-            G_act,
-            E_complexation,
-            H_complexation,
-            G_complexation,
+            reaction_energy_array,
+            activation_energy_array,
+            complexation_energy_array,
             G_r_complexes,
             G_act_complexes,
         ]
     else:
-        return [E_r, E_act, H_r, H_act, G_r, G_act]
+        return [reaction_energy_array, activation_energy_array]
 
 
 def get_xyz(idx, xyz_folder):
@@ -200,21 +175,21 @@ if __name__ == "__main__":
         lambda x: get_xyz(x, os.path.join(original_path, xyz_folder))
     )
 
-    dataset["E_r"] = dataset["output"].apply(lambda x: x[0])
-    dataset["E_act"] = dataset["output"].apply(lambda x: x[1])
+    dataset["E_r"] = dataset["output"].apply(lambda x: x[0][0])
+    dataset["E_act"] = dataset["output"].apply(lambda x: x[1][0])
 
-    dataset["H_r"] = dataset["output"].apply(lambda x: x[2])
-    dataset["H_act"] = dataset["output"].apply(lambda x: x[3])
+    dataset["H_r"] = dataset["output"].apply(lambda x: x[0][1])
+    dataset["H_act"] = dataset["output"].apply(lambda x: x[1][1])
 
-    dataset["G_r"] = dataset["output"].apply(lambda x: x[4])
-    dataset["G_act"] = dataset["output"].apply(lambda x: x[5])
+    dataset["G_r"] = dataset["output"].apply(lambda x: x[0][2])
+    dataset["G_act"] = dataset["output"].apply(lambda x: x[1][2])
 
     if args.complexes:
-        dataset["E_complexation"] = dataset["output"].apply(lambda x: x[6])
-        dataset["H_complexation"] = dataset["output"].apply(lambda x: x[7])
-        dataset["G_complexation"] = dataset["output"].apply(lambda x: x[8])
-        dataset["G_r_complexes"] = dataset["output"].apply(lambda x: x[9])
-        dataset["G_act_complexes"] = dataset["output"].apply(lambda x: x[10])
+        dataset["E_complexation"] = dataset["output"].apply(lambda x: x[2][0])
+        dataset["H_complexation"] = dataset["output"].apply(lambda x: x[2][1])
+        dataset["G_complexation"] = dataset["output"].apply(lambda x: x[2][2])
+        dataset["G_r_complexes"] = dataset["output"].apply(lambda x: x[3])
+        dataset["G_act_complexes"] = dataset["output"].apply(lambda x: x[4])
 
     os.chdir(original_path)
 
