@@ -2,7 +2,8 @@ from argparse import ArgumentParser
 import pandas as pd
 import os
 import shutil
-from autode import Species
+import autode as ade
+from autode.mol_graphs import find_cycles
 from autode.input_output import xyz_file_to_atoms
 from autode.geom import calc_rmsd
 import numpy as np
@@ -58,11 +59,16 @@ def correct_reaction_profiles(id, to_run, constrained, preliminary_dir, final_di
             xyz_original = os.path.join(os.path.join(final_dir, str(id)), f'{name}.xyz')
         except:
             print(f'An error has taken place during information extraction from alternative dipole conformer for {id}')
-            # break the function off
+            # abort
             return None
         # if constrained and different geometry, paste the line at the end of the original .csv file and copy the xyz-file
         if constrained == True:
-            # if constrained, then you first need to check whether the geometries are really different
+            # First do a final check that cyclization has not occured in the alternative dipole conformer; if it did -> remove profile and abort
+            cyclization = check_cyclization(xyz_original, xyz_alt)
+            if cyclization:
+                shutil.rmtree(os.path.join(final_dir, str(id)))
+                return None
+            # if constrained and alternative conformer valid, then you first need to check whether the geometries are really different
             is_unique = check_rmsd(xyz_original, xyz_alt)
             if is_unique:
                 include_alt_dipole_conf(final_dir, id, line_alt, xyz_alt)
@@ -71,8 +77,9 @@ def correct_reaction_profiles(id, to_run, constrained, preliminary_dir, final_di
             with open(os.path.join(os.path.join(final_dir, str(id)), 'energies.csv'), 'r') as f:
                 line_original = [line for line in f.readlines() if line.startswith(name)][0]
                 energy_original = float(line_original.split(',')[-1]) + float(line_original.split(',')[-3])
-            # if new energy more than than 1 kJ/0.239 kcal below original -> replace
-            if (energy_alt - energy_original) * hartree < -0.239:
+            # if new energy more than than 1 kJ/0.239 kcal below original and no cyclization in the alternative dipole conformer -> replace
+            cyclization = check_cyclization(xyz_original, xyz_alt)
+            if (energy_alt - energy_original) * hartree < -0.239 and not cyclization:
                 include_alt_dipole_conf(final_dir, id, line_alt, xyz_alt)
             else:
                 pass
@@ -105,16 +112,26 @@ def get_molecule_no_hydrogens(molecule):
 def check_rmsd(xyz_original, xyz_alt, threshold_rmsd=0.05):
     ''' Generate autodE species for the original and alternative dipole conformers and perform an RMSD comparison to verify uniqueness '''
     mol_original = get_molecule_no_hydrogens(
-        Species(name=xyz_original.rstrip('.xyz'), atoms=xyz_file_to_atoms(xyz_original), charge=0, mult=1)
+        ade.Species(name=xyz_original.rstrip('.xyz'), atoms=xyz_file_to_atoms(xyz_original), charge=0, mult=1)
     )
     mol_alt = get_molecule_no_hydrogens(
-        Species(name=xyz_alt.rstrip('.xyz'), atoms=xyz_file_to_atoms(xyz_alt), charge=0, mult=1)
+        ade.Species(name=xyz_alt.rstrip('.xyz'), atoms=xyz_file_to_atoms(xyz_alt), charge=0, mult=1)
     )
     rmsd = calc_rmsd(mol_alt.coordinates, mol_original.coordinates)
     if rmsd < threshold_rmsd:
         return False
     else:
         return True
+
+
+def check_cyclization(xyz_original, xyz_alt):
+    ade_mol_original = ade.Molecule(xyz_original, name='original')
+    ade_mol_alt = ade.Molecule(xyz_alt, name='alt')
+
+    if len(find_cycles(ade_mol_original.graph)) == len(find_cycles(ade_mol_alt.graph)):
+        return True
+    else:
+        return False
 
 
 def get_rxn_smiles_and_targets(filename):

@@ -11,8 +11,8 @@ parser = ArgumentParser()
 parser.add_argument(
     "--data_file",
     type=str,
-    required=False,
-    help="input .csv file containing the reaction data",
+    default="output_postprocessing_dipole_conformers.csv",
+    help="input .csv file containing the summary of the dipole postprocessing",
 )
 parser.add_argument(
     "--num_input_files", type=int, default=288, help="number of calculations to run in parallel"
