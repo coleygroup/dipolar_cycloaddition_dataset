@@ -5,38 +5,36 @@ import math
 
 from lib import ReactionDataPoint, InputFile
 
-
 parser = ArgumentParser()
 
 parser.add_argument(
-    "--data_file",
+    "--data-file",
     type=str,
     required=False,
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(
-    "--num_input_files", type=int, default=288, help="number of calculations to run in parallel"
+    "--num-input-files", type=int, default=288, help="number of calculations to run in parallel"
 )
-
 # autodE calculation
 parser.add_argument(
-    "--autodE_folder",
+    "--autodE-folder",
     type=str,
     default="reaction_profiles",
     help="folder for DFT calculation",
 )
 parser.add_argument(
-    "--DFT_theory",
+    "--DFT-theory",
     type=str,
     default=None,
     help="level of theory for the DFT calculation"
     "functional/basis_set_low/basis_set_high/disp_corr_keyword",
 )
 parser.add_argument(
-    "--n_cores", type=int, default=8, help="number of cores for autodE calculations"
+    "--n-cores", type=int, default=8, help="number of cores for autodE calculations"
 )
 parser.add_argument(
-    "--free_energy",
+    "--free-energy",
     dest="free_energy",
     action="store_true",
     help="To compute free energies",

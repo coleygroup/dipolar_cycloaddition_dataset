@@ -12,6 +12,7 @@ import csv
 hartree = 627.5094740631
 
 parser = ArgumentParser()
+
 parser.add_argument(
     "--data-file",
     type=str,
@@ -19,16 +20,16 @@ parser.add_argument(
     help="data set file (.csv)",
 )
 parser.add_argument(
-    "--output-postprocessing",
-    type=str,
-    required=True,
-    help="input .csv file obtained after postprocessing steps",
-)
-parser.add_argument(
     "--preliminary-profile-folder",
     type=str,
     required=True,
     help="folder containing reaction profiles before postprocessing",
+)
+parser.add_argument(
+    "--output-postprocessing",
+    type=str,
+    default='lowest_energy_conformers_RR',
+    help="input .csv file obtained after postprocessing steps",
 )
 parser.add_argument(
     "--finalized-profile-folder",

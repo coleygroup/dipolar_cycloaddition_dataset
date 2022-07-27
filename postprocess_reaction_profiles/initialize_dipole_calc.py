@@ -5,38 +5,36 @@ import math
 
 from lib import DipoleDataPoint, InputFile
 
-
 parser = ArgumentParser()
 
 parser.add_argument(
-    "--data_file",
+    "--data-file",
     type=str,
     default="output_postprocessing_dipole_conformers.csv",
     help="input .csv file containing the summary of the dipole postprocessing",
 )
 parser.add_argument(
-    "--num_input_files", type=int, default=288, help="number of calculations to run in parallel"
+    "--num-input-files", type=int, default=288, help="number of calculations to run in parallel"
 )
-
 # autodE calculation
 parser.add_argument(
-    "--autodE_folder",
+    "--autodE-folder",
     type=str,
     default="lowest_energy_conformers_RR",
     help="folder for the DFT calculations",
 )
 parser.add_argument(
-    "--DFT_theory",
+    "--DFT-theory",
     type=str,
     default=None,
     help="level of theory for the DFT calculation"
     "functional/basis_set_low/basis_set_high/disp_corr_keyword",
 )
 parser.add_argument(
-    "--n_cores", type=int, default=4, help="number of cores for autodE calculations"
+    "--n-cores", type=int, default=4, help="number of cores for autodE calculations"
 )
 parser.add_argument(
-    "--free_energy",
+    "--free-energy",
     dest="free_energy",
     action="store_true",
     help="To compute free energies",

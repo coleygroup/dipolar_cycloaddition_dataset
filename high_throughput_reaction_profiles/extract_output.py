@@ -9,13 +9,13 @@ hartree = 627.5094740631
 
 parser = ArgumentParser()
 parser.add_argument(
-    "--data_file",
+    "--data-file",
     type=str,
     required=True,
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(
-    "--output_folder",
+    "--output-folder",
     type=str,
     default="reaction_profiles",
     help="folder containing computed reaction profiles",

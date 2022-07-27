@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 from rdkit import Chem
 import os
 import pandas as pd
@@ -12,6 +13,23 @@ from autode.mol_graphs import find_cycles
 import tempfile
 
 hartree = 627.5094740631
+
+parser = ArgumentParser()
+parser.add_argument(
+    "--data-file",
+    type=str,
+    required=True,
+    help="data set file (.csv)",
+)
+parser.add_argument(
+    "--xyz-folder", 
+    type=str, 
+    required=True,
+    help="name (not path) of the folder with the (preliminary) reaction profiles"
+)
+parser.add_argument(
+    "--n-cores", type=int, default=48, help="number of cores to be used"
+)
 
 def find_dipole(rxn_smiles):
     ''' Locate the dipole within the reaction SMILES '''
@@ -30,10 +48,10 @@ def parse_coordinates(lines):
     return np.array(coordinates)
 
 
-def extract_ts_geometry(r_smiles, p_smiles, rxn_id, home_dir, work_dir, geom_file='xyz_ultimate9/'):
+def extract_ts_geometry(r_smiles, p_smiles, rxn_id, home_dir, work_dir, geom_dir):
     ''' Wrapper around the TSGeomExtractor object (can take care of potential failures etc.) '''
     os.chdir(home_dir)
-    geom_path = os.path.join(home_dir, geom_file)
+    geom_path = os.path.join(home_dir, geom_dir)
     return TSGeomExtractor(r_smiles, p_smiles, rxn_id, work_dir, geom_path)
 
 
@@ -404,7 +422,7 @@ class TSGeomExtractor:
         return dihedral_angles_to_track
 
 
-def get_input_pool(df, home_dir, tmp_dir):
+def get_input_pool(df, home_dir, tmp_dir, geom_dir):
     ''' Extract relevant input from each row in the dataframe and return in list format '''
     df['dipole_smiles'] = df['rxn_smiles'].apply(lambda x: find_dipole(x))
     df['product_smiles'] = df['rxn_smiles'].apply(lambda x: x.split('>')[-1])
@@ -414,8 +432,9 @@ def get_input_pool(df, home_dir, tmp_dir):
     rxn_id_list = df.index.tolist()
     home_dir_list = [home_dir for i in range(len(rxn_id_list))]
     tmp_dir_list = [tmp_dir for i in range(len(rxn_id_list))]
+    geom_dir_list = [geom_dir for i in range(len(rxn_id_list))]
 
-    input_list = list(zip(dipole_smiles_list, product_smiles_list, rxn_id_list, home_dir_list, tmp_dir_list))
+    input_list = list(zip(dipole_smiles_list, product_smiles_list, rxn_id_list, home_dir_list, tmp_dir_list, geom_dir))
 
     return input_list
 
@@ -423,8 +442,8 @@ def get_input_pool(df, home_dir, tmp_dir):
 def get_compatible_conformer(input_tuple):
     ''' Generate a stereo-compatible conformer for the dipole '''
     # extract all info necessary to perform 
-    dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir = input_tuple
-    geometry_extractor = extract_ts_geometry(dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir)
+    dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir, geom_dir = input_tuple
+    geometry_extractor = extract_ts_geometry(dipole_smiles, product_smiles, rxn_id, home_dir, tmp_dir, geom_dir)
 
     if not geometry_extractor.continue_workflow:
         return dipole_smiles, rxn_id, None, None, None
@@ -446,7 +465,7 @@ def get_compatible_conformer(input_tuple):
     return name, rxn_id, energy_difference, to_run, constrained
 
 
-def get_all_compatible_conformers(csv_file, num_cores=48):
+def get_all_compatible_conformers(csv_file, geom_dir, num_cores):
     ''' Main function which controls the process pool to obtain stereo-compatible conformers for the all the dipoles '''
     # Set up the logger
     logger_name = f"{csv_file.split('/')[-1].rstrip('.csv')}_dipole_geom_compatibility"
@@ -456,7 +475,7 @@ def get_all_compatible_conformers(csv_file, num_cores=48):
 
     # Prepare the input
     df = pd.read_csv(csv_file)
-    input_list = get_input_pool(df, pwd, tmp_dir)
+    input_list = get_input_pool(df, pwd, tmp_dir, geom_dir)[5738:5740]
 
     # Get everything related to the output set up
     os.makedirs(os.path.join(pwd, 'rotation_profiles'), exist_ok=True)
@@ -499,4 +518,5 @@ def get_all_compatible_conformers(csv_file, num_cores=48):
             f.write(f'{i}, {output[0]}.xyz,{output[1]},{output[2]},{output[3]},{output[4]}\n')
 
 if __name__ == '__main__':
-    get_all_compatible_conformers('combined_dataset.csv')
+    args = parser.parse_args()
+    get_all_compatible_conformers(args.data_file, args.xyz_folder, args.n_cores)
