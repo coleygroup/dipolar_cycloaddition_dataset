@@ -80,11 +80,14 @@ python initialize_dipole_calc.py --data_file <path to .csv file with the postpro
 
 The script batches up the dipoles in individual Python files, each containing a linear sequence of autodE geometry optimizations and frequency calculations, and places them in the selected `autodE_folder` containing the alternative dipole conformer `.xyz` files (the default name is once again `lowest_energy_conformers_RR`).  Again, the number of files can be defined in the `num_input_files` command line option. By default, 4 cores are used per computation, no free energy corrections nor complexes are computed and the PBE0-D3(BJ)/def2tzvp//PBE0-D3(BJ)/def2svp level of theory is used. These default options can be adjusted with the help of the corresponding command line flags.
 
-Finally, the `finalize_reaction_profiles.py` script can be called to combine the preliminary reaction profiles with the corrected dipole conformers and recompute the activation and reaction energies. The input of this script consists of the full data set `.xyz` file, the output `.csv` file from `postprocess_reaction_profiles.py` (vide supra), the preliminary, i.e., uncorrected, reaction profile directory and the `lowest_energy_conformers_RR` directory. As output, the script generates a finalized reaction profile folder as well as a `.csv` file with all the reaction SMILES and their computed activation and reaction energies. It can be executed as follows:
+Finally, the `finalize_reaction_profiles.py` script can be called to combine the preliminary reaction profiles with the corrected dipole conformers and recompute the activation and reaction energies. The input of this script consists of the full data set `.xyz` file, the output `.csv` file from `postprocess_reaction_profiles.py` (vide supra), the preliminary, i.e., uncorrected, reaction profile directory and the `lowest_energy_conformers_RR` directory which is obtained after execution of the two preceding scripts in this section. As output, the script generates a finalized reaction profile folder as well as a `.csv` file with all the reaction SMILES and their computed activation and reaction energies. It can be executed as follows:
 ```
-python finalize_reaction_profiles.py --data-file <data set .csv file> --preliminary-profile-folder <folder containing reaction profiles before postprocessing> [--output-postprocessing <input .csv file obtained after postprocessing steps>] [--finalized-profile-folder <folder in which to store the finalized reaction profiles>]
+python finalize_reaction_profiles.py --data-file <data set .csv file> --preliminary-profile-folder <folder containing reaction profiles before postprocessing> [--output-postprocessing <input .csv file obtained after postprocessing steps>] [--output-folder-postprocessing <folder containing the optimized dipole .xyz-files and energy values>] [--finalized-profile-folder <folder in which to store the finalized reaction profiles>]
 ```
 
+## Final dataset
+
+The `.csv` file, containing the curated final dataset, can be found in the main directory (`output_reaction_profiles_finalized.csv`). The geometries and energies for each of the reactions can be found at xxx.
 ## References
 
 If (parts of) this workflow are used as part of a publication please cite the associated paper:
