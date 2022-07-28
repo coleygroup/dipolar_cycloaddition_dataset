@@ -3,7 +3,7 @@ from rdkit import Chem
 
 
 class ReactionDataPoint:
-    '''
+    """
     Class storing the settings for a single reaction
 
     Attributes:
@@ -19,7 +19,7 @@ class ReactionDataPoint:
         make_folder: Makes the folder in which the reaction profile calculation will be performed
         process_smiles: Removes the atom-mapping from the reaction SMILES (necessary for autodE)
         clean_up_folder: Cleans up the reaction profile folder after calculation has finished (moving intermediate files to archive)
-    '''
+    """
 
     def __init__(
         self,
@@ -43,12 +43,12 @@ class ReactionDataPoint:
         self.make_folder()
 
     def make_folder(self):
-        ''' Makes the folder in which the reaction profile calculation will be performed '''
+        """Makes the folder in which the reaction profile calculation will be performed"""
         if not os.path.isdir(self.folder_name):
             os.mkdir(self.folder_name)
 
     def process_smiles(self, rxn_smiles):
-        ''' Removes the atom-mapping from the reaction SMILES (necessary for autodE) '''
+        """Removes the atom-mapping from the reaction SMILES (necessary for autodE)"""
         if ":" in rxn_smiles:
             r_smiles, p_smiles = rxn_smiles.split(">>")
             r_mol = Chem.MolFromSmiles(r_smiles)
@@ -62,7 +62,7 @@ class ReactionDataPoint:
             return rxn_smiles
 
     def clean_up_folder(self):
-        ''' Cleans up the reaction profile folder after calculation has finished (moving intermediate files to archive) '''
+        """Cleans up the reaction profile folder after calculation has finished (moving intermediate files to archive)"""
         path = os.path.join(os.getcwd(), self.rxn_id)
         if self.free_energy and self.complexes:
             dir_list = [
@@ -105,7 +105,7 @@ class ReactionDataPoint:
         )
 
     def __str__(self):
-        ''' Prints output corresponding to the reaction data point '''
+        """Prints output corresponding to the reaction data point"""
         if self.solvent == "gas":
             if self.free_energy and self.complexes:
                 return (
@@ -153,13 +153,13 @@ class ReactionDataPoint:
 
 
 class InputFile:
-    '''
+    """
     Class which sets up an autodE inputfile
 
     Attributes:
         idx (int): The identifier of the inputfile
         ncores (int): The number of cores that will be used during the calculation
-        level_of_theory (str): The DFT level of theory (func/basis1/basis2/disp_corr) 
+        level_of_theory (str): The DFT level of theory (func/basis1/basis2/disp_corr)
         autode_folder (str): The overarching autodE folder in which the input files need to be stored
 
     Methods:
@@ -167,7 +167,7 @@ class InputFile:
         initialize_input_file: Writes the common lines to the autodE input script
         close_input_file: Closes the input file after all the individual data points have been written
         write_reaction_point: Writes a reaction to the input file
-    '''
+    """
 
     def __init__(
         self,
@@ -195,7 +195,7 @@ class InputFile:
         self.initialize_input_file()
 
     def write_reaction_point(self, data_point, reaction_num):
-        ''' Writes a reaction to the input file '''
+        """Writes a reaction to the input file"""
         self.file.write("os.chdir(path) \n \n")
         self.file.write("try: \n")
         self.file.write(str(data_point))
@@ -215,11 +215,11 @@ class InputFile:
         self.file.write(f'    subprocess.run(["rm", "-r", f"{{path_to_tar}}"]) \n \n')
 
     def close_input_file(self):
-        ''' Closes the input file after all the individual data points have been written '''
+        """Closes the input file after all the individual data points have been written"""
         self.file.close()
 
     def initialize_input_file(self):
-        ''' Writes the common lines to the autodE input script '''
+        """Writes the common lines to the autodE input script"""
         if self.functional is not None:
             low_opt, grad, opt, opt_ts, hess, sp = self.determine_keywords()
 
@@ -250,7 +250,7 @@ class InputFile:
             )
 
     def determine_keywords(self):
-        ''' Determines and formats all the keywords necessary for the autodE calculation '''
+        """Determines and formats all the keywords necessary for the autodE calculation"""
         ts_str = (
             "Opt=(TS, CalcFC, NoEigenTest, MaxCycles=100, MaxStep=10, "
             "NoTrustUpdate, RecalcFC=30)"

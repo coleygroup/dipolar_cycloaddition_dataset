@@ -14,7 +14,10 @@ parser.add_argument(
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(
-    "--num-input-files", type=int, default=288, help="number of calculations to run in parallel"
+    "--num-input-files",
+    type=int,
+    default=288,
+    help="number of calculations to run in parallel",
 )
 # autodE calculation
 parser.add_argument(
@@ -76,14 +79,15 @@ if __name__ == "__main__":
 
     os.chdir(args.autodE_folder)
 
-    num_calc = math.ceil(len(data_point_list) /args.num_input_files)
+    num_calc = math.ceil(len(data_point_list) / args.num_input_files)
 
     for i in range(0, args.num_input_files):
         file = InputFile(i, args.n_cores, args.DFT_theory, args.autodE_folder)
         for j in range(0, num_calc):
             try:
                 file.write_reaction_point(
-                    data_point_list[j * args.num_input_files + i], j * args.num_input_files + i
+                    data_point_list[j * args.num_input_files + i],
+                    j * args.num_input_files + i,
                 )
             except IndexError:
                 break

@@ -29,7 +29,7 @@ parser.add_argument(
 
 
 def get_rxn_smiles_and_targets(filename):
-    ''' Read in the input .csv-file, rename rxn_id column and initialize the output columns '''
+    """Read in the input .csv-file, rename rxn_id column and initialize the output columns"""
     df = pd.read_csv(filename)
     df.rename(columns={"Unnamed: 0": "rxn_id"}, inplace=True)
 
@@ -40,7 +40,7 @@ def get_rxn_smiles_and_targets(filename):
 
 
 def extract_energies(row):
-    ''' Extract energies from a single line in an energies.csv-file '''
+    """Extract energies from a single line in an energies.csv-file"""
     energy = float(row[-1])
     try:
         enthalpy = float(row[-1]) + float(row[-2])
@@ -52,29 +52,29 @@ def extract_energies(row):
 
 
 def extract_output(idx, complexes: bool = False):
-    ''' Extract and process energy values for each of the species associated with a reaction '''
+    """Extract and process energy values for each of the species associated with a reaction"""
     r_alt_name = None
 
     path = os.path.join(os.getcwd(), str(idx))
     file = os.path.join(path, "output/energies.csv")
     if not os.path.isfile(file):
         path = os.path.join(os.getcwd(), f"r{str(idx)}")
-        file = os.path.join(path, "output/energies.csv") 
+        file = os.path.join(path, "output/energies.csv")
 
     try:
         with open(file, "r") as csv_file:
             csv_reader = csv.reader(csv_file)
             reaction_data = [row for row in csv_reader]
             for row in reaction_data[2:]:
-                if row[0].startswith('r0'):
+                if row[0].startswith("r0"):
                     r0_energy_array = extract_energies(row)
-                elif row[0].startswith('r1'):
+                elif row[0].startswith("r1"):
                     r1_energy_array = extract_energies(row)
-                elif row[0].startswith('p0'):
+                elif row[0].startswith("p0"):
                     product_energy_array = extract_energies(row)
-                elif row[0].startswith('TS'):
+                elif row[0].startswith("TS"):
                     ts_energy_array = extract_energies(row)
-                elif row[0].endswith('_alt'):
+                elif row[0].endswith("_alt"):
                     r_alt_energy_array = extract_energies(row)
                 elif row[0].endswith("_reactant"):
                     r_complex_energy_array = extract_energies(row)
@@ -82,9 +82,9 @@ def extract_output(idx, complexes: bool = False):
                     p_complex_energy_array = extract_energies(row)
 
         if r_alt_name is not None:
-            if r_alt_name.startswith('r0'):
+            if r_alt_name.startswith("r0"):
                 reactant_energy_array = r_alt_energy_array + r1_energy_array
-            elif r_alt_name.startswith('r1'):
+            elif r_alt_name.startswith("r1"):
                 reactant_energy_array = r_alt_energy_array + r0_energy_array
         else:
             reactant_energy_array = r0_energy_array + r1_energy_array
@@ -92,17 +92,25 @@ def extract_output(idx, complexes: bool = False):
         reaction_energy_array = (product_energy_array - reactant_energy_array) * hartree
 
         try:
-            activation_energy_array = (ts_energy_array - reactant_energy_array) * hartree
+            activation_energy_array = (
+                ts_energy_array - reactant_energy_array
+            ) * hartree
         except UnboundLocalError:
             print(f"No Barrier found for {idx}!")
             activation_energy_array = np.array([None, None, None])
 
         if complexes:
-            complexation_energy_array = (r_complex_energy_array - reactant_energy_array) * hartree
+            complexation_energy_array = (
+                r_complex_energy_array - reactant_energy_array
+            ) * hartree
 
-            G_r_complexes = (p_complex_energy_array[-1] - r_complex_energy_array[-1]) * hartree
+            G_r_complexes = (
+                p_complex_energy_array[-1] - r_complex_energy_array[-1]
+            ) * hartree
             try:
-                G_act_complexes = (ts_energy_array[-1] - r_complex_energy_array[-1]) * hartree
+                G_act_complexes = (
+                    ts_energy_array[-1] - r_complex_energy_array[-1]
+                ) * hartree
             except UnboundLocalError:
                 G_act_complexes = None
 
@@ -110,14 +118,22 @@ def extract_output(idx, complexes: bool = False):
         print(f"File for {idx} does not exist!")
         if complexes:
             (
-                reaction_energy_array, 
-                activation_energy_array, 
+                reaction_energy_array,
+                activation_energy_array,
                 complexation_energy_array,
                 G_r_complexes,
                 G_act_complexes,
-            ) = (np.array([None, None, None]), np.array([None, None, None]), np.array([None, None, None]), None, None)
+            ) = (
+                np.array([None, None, None]),
+                np.array([None, None, None]),
+                np.array([None, None, None]),
+                None,
+                None,
+            )
         else:
-            reaction_energy_array, activation_energy_array = np.array([None, None, None]), np.array([None, None, None])
+            reaction_energy_array, activation_energy_array = np.array(
+                [None, None, None]
+            ), np.array([None, None, None])
 
     if None not in activation_energy_array:
         print(f"Reaction profile found for {idx}!")
@@ -135,7 +151,7 @@ def extract_output(idx, complexes: bool = False):
 
 
 def get_xyz(idx, xyz_folder):
-    ''' Copy .xyz-files from output folder to xyz-folder; if failed calculation, then just return None '''
+    """Copy .xyz-files from output folder to xyz-folder; if failed calculation, then just return None"""
     path = os.path.join(os.getcwd(), str(idx))
     folder = os.path.join(path, "output")
     file = os.path.join(path, "output/energies.csv")

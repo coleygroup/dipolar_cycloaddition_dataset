@@ -14,7 +14,10 @@ parser.add_argument(
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(
-    "--num-input-files", type=int, default=288, help="number of calculations to run in parallel"
+    "--num-input-files",
+    type=int,
+    default=288,
+    help="number of calculations to run in parallel",
 )
 # autodE calculation
 parser.add_argument(
@@ -49,7 +52,7 @@ parser.add_argument(
 
 
 def not_yet_run(idx, failed_calc_list):
-    ''' Determines if a data point has already been run through index matching '''
+    """Determines if a data point has already been run through index matching"""
     if idx in failed_calc_list:
         return False
     else:
@@ -75,8 +78,7 @@ if __name__ == "__main__":
     output_list = df_output["rxn_id"].tolist()
 
     df_input["not_yet_run"] = df_input["index"].apply(
-        lambda x: str(x) not in failed_calculations
-        and x not in output_list
+        lambda x: str(x) not in failed_calculations and x not in output_list
     )
 
     df_to_do = df_input[df_input["not_yet_run"]]
@@ -102,14 +104,15 @@ if __name__ == "__main__":
 
     os.chdir(args.autodE_folder)
 
-    num_calc = math.ceil(len(data_point_list) /args.num_input_files)
+    num_calc = math.ceil(len(data_point_list) / args.num_input_files)
 
     for i in range(0, args.num_input_files):
-        file = InputFile(i+1, args.n_cores, args.DFT_theory, args.autodE_folder)
+        file = InputFile(i + 1, args.n_cores, args.DFT_theory, args.autodE_folder)
         for j in range(0, num_calc):
             try:
                 file.write_reaction_point(
-                    data_point_list[j * args.num_input_files + i], j * args.num_input_files + i
+                    data_point_list[j * args.num_input_files + i],
+                    j * args.num_input_files + i,
                 )
             except IndexError:
                 break
