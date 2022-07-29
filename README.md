@@ -24,7 +24,7 @@ conda env create --name <env-name> --file environment.yml
 
 ## Generating the search space and reaction SMILES
 
-The Jupyter notebooks used to generate the search space for both dipoles and dipolarophiles are included in the `dataset_construction` directory. The full list of generated species and the extracted samples used throughout the workflow can be found in the `full_list_dipoles_dipolarophiles` and `sample_list` sub-directories respectively. The `dataset_construction` directory furthermore contains Python scripts to combine dipoles and dipolarophiles into valid reaction SMILES. The first script generates reaction SMILES for the synthetic and biofragment-based dipolarophiles separately:
+The Jupyter notebooks used to generate the search space for both dipoles and dipolarophiles are included in the `dataset_construction` directory (`dipoles_construction.ipynb` and `dipoles_construction.ipynb` respectively). The full list of generated species and the extracted samples used throughout the workflow can be found in the `full_list_dipoles_dipolarophiles` and `sample_list` sub-directories respectively. The `dataset_construction` directory furthermore contains Python scripts to combine dipoles and dipolarophiles into valid reaction SMILES. The first script generates reaction SMILES for the synthetic and biofragment-based dipolarophiles separately:
 ```
 python construct_dataset_finalized.py
 ```
@@ -64,16 +64,16 @@ Note that many reactant dipoles require postprocessing to make their geometry co
 
 ## Post-processing reaction SMILES to ensure stereo-compatibility of the dipoles
 
-The main script in the `postprocess_reaction_profiles` directory, `postprocess_reaction_profiles.py`, checks for compatibility between the reactant dipole conformer and the conformation taken on by this species in the TS. It takes as an input the full data set `.xyz` file, as well as the output folder obtained after execution of the `extract_output.py` script from the previous section. The output is a new folder, `lowest_energy_conformers_RR`, containing directories and xyz-files for each individual dipole which might need to be replaced (vide infra), as well as a `.csv` file indicating for each dipole whether or not it needs to be run and whether the geometry was constrained. 
+The main script in the `postprocess_reaction_profiles` directory, `postprocess_reaction_profiles.py`, checks for compatibility between the reactant dipole conformer and the conformation taken on by this species in the TS. It takes as an input the full data set `.csv` file, as well as the output folder obtained after execution of the `extract_output.py` script from the previous section. The output is a new folder, `lowest_energy_conformers_RR`, containing directories and `.xyz` files for each individual dipole which might need to be replaced (vide infra), as well as a `.csv` file indicating for each dipole whether or not it needs to be run and whether the geometry was constrained. 
 
-More specifically, the script extracts the dipole geometry from the TS `.xyz` file, optimizes the geometry, checks rotatability of the individual dihedral angles over the (partially) double bonds connecting the 3 reactive centers in the dipole and then performs a (constrained) randomize and relax conformer search. If constraints were applied during the search, i.e., if at least one of the bonds was not rotatable, then the lowest energy conformer is always saved. If this is not the case, then the newly generated conformer is only saved when it is lower in energy than the originally registered conformer.   
+More specifically, the script extracts the dipole geometry from the TS `.xyz` file, optimizes the geometry, checks rotatability of the individual dihedral angles over the (partially) double bonds connecting the 3 reactive centers in the dipole at GFN2-XTB level of theory and then performs a (constrained) randomize and relax conformer search. If constraints were applied during the search, i.e., if at least one of the bonds was not rotatable, then the lowest energy conformer is always saved. If this is not the case, then the newly generated conformer is only saved when it is lower in energy than the originally registered conformer.   
 
 The script can be executed as follows:
 ```
 python postprocess_reaction_profiles.py --data-file <path to the input .csv file> --xyz-folder <xyz_folder> [--n-cores <number of cores to be used>]
 ```
 
-Once a `lowest_energy_conformers_RR` directory has been generated, a script making heavy use of autodE can be called to geometrically and energetically refine the alternative RR conformers generated during postprocessing. This script is very similar to the `initialize.py` script and can be executed as follows:
+Once a `lowest_energy_conformers_RR` directory has been generated, a script making use of autodE can be called to geometrically and energetically refine the alternative RR conformers generated during postprocessing. This script is very similar to the `initialize.py` script and can be executed as follows:
 ```
 python initialize_dipole_calc.py --data_file <path to .csv file with the postprocessing output> --num_input_files <total number of files to be generated> [--autodE_folder <name of the autodE folder>] [--n_cores <number of cores per computation>] [--DFT_theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free_energy]
 ```
