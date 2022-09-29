@@ -583,7 +583,7 @@ def get_input_pool(df, home_dir, tmp_dir, geom_dir):
             rxn_id_list,
             home_dir_list,
             tmp_dir_list,
-            geom_dir,
+            geom_dir_list,
         )
     )
 
