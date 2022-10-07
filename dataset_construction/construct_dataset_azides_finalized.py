@@ -147,7 +147,9 @@ def get_dipolarophile_map_num_range(reactant_smiles):
     reactant_smiles = map_smiles(reactant_smiles)
     reactant_smiles_list = reactant_smiles.split(".")
     for smi in reactant_smiles_list:
-        if "+" not in smi and "-" not in smi:
+        if "+" in smi and "-" in smi:
+            continue
+        else:
             map_num_list = [
                 atom.GetAtomMapNum() for atom in Chem.MolFromSmiles(smi).GetAtoms()
             ]
@@ -311,15 +313,15 @@ def get_bio_dipolarophiles_list():
         "C=C",
         "C/C=C/C",
         "C/C=C\C",  # prostaglandines etc.
-        "OC(=O)/C=C\C(=O)O",
-        "OC(=O)/C=C/C(=O)O",  # fumaric and maleic acid
+        "[O-]C(=O)/C=C\C(=O)[O-]",
+        "[O-]C(=O)/C=C/C(=O)[O-]",  # fumaric and maleic acid
         "C1(=O)C=CC(=O)C=C1",
         "C1(=O)C(OC)=C(OC)C(=O)C(C)=C1C",  # ubiquinone
         "CC(C)=C(C)C",  # terpineol
         "C1C=CN(C)C=C1C(N)=O",  # NADH
         "CC(C)=CC=O",  # retinal
         "CC(C)=C/C=C/C(C)=C",  # retinol, beta-caroteen
-        "NC(N)=NC",
+        "[NH2+]=C(N)NC",
     ]
 
     return bio_dipolarophiles_list
