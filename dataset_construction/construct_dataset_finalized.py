@@ -146,7 +146,9 @@ def get_dipolarophile_map_num_range(reactant_smiles):
     reactant_smiles = map_smiles(reactant_smiles)
     reactant_smiles_list = reactant_smiles.split(".")
     for smi in reactant_smiles_list:
-        if "+" not in smi and "-" not in smi:
+        if "+" in smi and "-" in smi:
+            continue
+        else:
             map_num_list = [
                 atom.GetAtomMapNum() for atom in Chem.MolFromSmiles(smi).GetAtoms()
             ]
@@ -311,15 +313,15 @@ def get_bio_dipolarophiles_list(n=1500):
         "C=C",
         "C/C=C/C",
         "C/C=C\C",  # prostaglandines etc.
-        "OC(=O)/C=C\C(=O)O",
-        "OC(=O)/C=C/C(=O)O",  # fumaric and maleic acid
+        "[O-]C(=O)/C=C\C(=O)[O-]",
+        "[O-]C(=O)/C=C/C(=O)[O-]",  # fumaric and maleic acid
         "C1(=O)C=CC(=O)C=C1",
         "C1(=O)C(OC)=C(OC)C(=O)C(C)=C1C",  # ubiquinone
         "CC(C)=C(C)C",  # terpineol
         "C1C=CN(C)C=C1C(N)=O",  # NADH
         "CC(C)=CC=O",  # retinal
         "CC(C)=C/C=C/C(C)=C",  # retinol, beta-caroteen
-        "NC(N)=NC",  # argininosuccinic acid
+        "[NH2+]=C(N)NC",  # argininosuccinic acid
     ]
 
     df_biofragments = pd.DataFrame(bio_dipolarophiles_list)
@@ -332,7 +334,7 @@ def get_bio_dipolarophiles_list(n=1500):
 def get_dipole_list(filename="sample_lists/dipoles_sample.csv"):
     """Get the dipole list from input file"""
     dipoles = pd.read_csv(filename)
-    dipoles_list = dipoles["0"].values.tolist()
+    dipoles_list = dipoles["dipole"].values.tolist()
 
     return dipoles_list
 
@@ -343,7 +345,7 @@ def get_synthetic_dipolarophiles_list(
     """Get the (shuffled) dipolarophile list from input file"""
     dipolarophiles = pd.read_csv(filename)
     dipolarophiles = dipolarophiles.sample(frac=1, random_state=3)
-    dipolarophiles_list = dipolarophiles["0"].values.tolist()
+    dipolarophiles_list = dipolarophiles["dipolarophile"].values.tolist()
 
     return dipolarophiles_list
 
@@ -448,7 +450,7 @@ if __name__ == "__main__":
     rxn_smiles_list = []
     dipole_list = get_dipole_list("sample_lists/dipoles_sample.csv")
     synthetic_dipolarophiles_list = get_synthetic_dipolarophiles_list(
-        "sample_lists/dipolarophiles_sample.csv"
+        "sample_lists/dipolarophiles_sample_new.csv"
     )
     (
         smarts_list_double,
