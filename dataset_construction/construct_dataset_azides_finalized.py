@@ -475,5 +475,6 @@ if __name__ == "__main__":
     df["rxn_smiles"] = df[0]
 
     with open("azide_test_reactions_finalized.csv", "w") as f:
+        f.write(",rxn_smiles,solvent,temp\n")
         for idx, rxn_smiles in enumerate(rxn_smiles_list):
             f.write(get_data_point(idx, rxn_smiles, "water", 298.15))
