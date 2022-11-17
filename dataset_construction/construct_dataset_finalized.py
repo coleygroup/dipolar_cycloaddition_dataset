@@ -450,7 +450,7 @@ if __name__ == "__main__":
     rxn_smiles_list = []
     dipole_list = get_dipole_list("sample_lists/dipoles_sample.csv")
     synthetic_dipolarophiles_list = get_synthetic_dipolarophiles_list(
-        "sample_lists/dipolarophiles_sample_new.csv"
+        "sample_lists/dipolarophiles_sample.csv"
     )
     (
         smarts_list_double,
@@ -484,6 +484,7 @@ if __name__ == "__main__":
     # write to file
     rxn_smiles_written_synthetic, i = [], 0
     with open("reactions_synthetic_finalized.csv", "w") as f:
+        f.write(",rxn_smiles,solvent,temp\n")
         for rxn_smiles in rxn_smiles_list:
             if rxn_smiles not in rxn_smiles_written_synthetic:
                 f.write(get_data_point(i, rxn_smiles, "water", 298.15))
@@ -522,6 +523,7 @@ if __name__ == "__main__":
     # write to file
     rxn_smiles_written_bio, j = [], 0
     with open("reactions_biofrag_finalized.csv", "w") as f:
+        f.write(",rxn_smiles,solvent,temp\n")
         for rxn_smiles in rxn_smiles_list2:
             if rxn_smiles not in rxn_smiles_written_bio:
                 f.write(get_data_point(j, rxn_smiles, "water", 298.15))
