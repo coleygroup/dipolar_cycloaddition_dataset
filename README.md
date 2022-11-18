@@ -42,20 +42,25 @@ The outputted `.csv` file used in the automated workflow is also included in the
 
 Input files for high-throughput reaction profile computations, based on the reaction SMILES outputted in the previous section, can be generated with the help of the `initialize.py` script in the `high_throughput_reaction_profiles` directory as follows:
 ```
-python initialize.py --data-file <path to the input .csv file> --num-input-files <total number of files to be generated> --autodE-folder <name of the autodE folder to be generated> [--n-cores <number of cores per computation>] [--DFT-theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free-energy] [--complexes]
+python initialize.py --data-file <path to the input .csv file> [--num-input-files <total number of files to be generated>] [--autodE-folder <name of the autodE folder to be generated>] [--n-cores <number of cores per computation>] [--DFT-theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free-energy] [--complexes]
 ```
 The script batches up the reaction SMILES in individual Python files, each containing a linear sequence of autodE reaction profile computations, and places them in the `autodE_folder` (the number of files can be defined in the `num_input_files` command line option). Additionally, the script generates sub-directories for each individual reaction SMILES in the `autodE_folder` (the sub-directories are numbered based on the indices in the input file). By default, 4 cores are used per computation, no free energy corrections nor complexes are computed and the PBE0-D3(BJ)/def2tzvp//PBE0-D3(BJ)/def2svp level of theory is used. These default options can be adjusted with the help of the corresponding command line flags.
+
+Under the condition that the scripts in the previous section have been run, the `initialize.py` script can for example be executed as follows:
+```
+python initialize.py --data-file ../dataset_construction/azide_test_reactions_finalized.csv --num-input-files 10 --autodE-folder test --DFT-theory B3LYP/def2svp/def2tzvp/EmpiricalDispersion=GD3BJ --free-energy
+```
 
 Once the input files have been generated, they can be executed with the help of a job array (potentially [with triples](https://supercloud.mit.edu/job-arrays-llsub-triples-3-steps)).
 
 To resume an interrupted workflow, a re-initialization can be performed which will generate new input files (with an 'r' prefix) containing only the autodE  computations which haven't been run yet:
 ```
-python re_initialize.py --data-file <path to the input .csv file> --num_input-files <total number of files to be generated> --autodE-folder <name of the autodE folder to be generated> [--n-cores <number of cores per computation>] [--DFT-theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free-energy] [--complexes]
+python re_initialize.py --data-file <path to the input .csv file> [--num_input-files <total number of files to be generated>] [--autodE-folder <name of the autodE folder to be generated>] [--n-cores <number of cores per computation>] [--DFT-theory <functional/low_basis_set/high_basis_set/dispersion_correction>] [--free-energy] [--complexes]
 ```
 
 Finally, the `high_throughput_reaction_profiles` directory also contains a script to extract the relevant output from the `autodE_folder`. This script can be executed as follows:
 ```
-python extract_output.py --data-file <path to the input .csv file> --output-folder <autodE_folder> [--complexes]
+python extract_output.py --data-file <path to the input .csv file> [--output-folder <autodE_folder>] [--complexes]
 ```
 
 This script will copy all final .xyz files as well as the `energies.csv` to a new directory (`xyz_folder_<output_folder>`). Additionally, it creates a .csv file containing the successfully computed reaction SMILES together with the activition energies/enthalpies/free energies as well as the reaction energies/enthalpies/free energies (`output_<output_folder>.csv`). 
