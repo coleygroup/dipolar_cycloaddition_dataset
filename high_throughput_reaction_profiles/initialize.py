@@ -10,7 +10,7 @@ parser = ArgumentParser()
 parser.add_argument(
     "--data-file",
     type=str,
-    required=False,
+    required=True,
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(

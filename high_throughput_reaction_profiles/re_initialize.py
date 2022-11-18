@@ -10,7 +10,7 @@ parser = ArgumentParser()
 parser.add_argument(
     "--data-file",
     type=str,
-    required=False,
+    required=True,
     help="input .csv file containing the reaction data",
 )
 parser.add_argument(
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     num_calc = math.ceil(len(data_point_list) / args.num_input_files)
 
     for i in range(0, args.num_input_files):
-        file = InputFile(i + 1, args.n_cores, args.DFT_theory, args.autodE_folder)
+        file = InputFile(i + 1, args.n_cores, args.DFT_theory, args.autodE_folder, relaunch=True)
         for j in range(0, num_calc):
             try:
                 file.write_reaction_point(

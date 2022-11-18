@@ -161,6 +161,7 @@ class InputFile:
         ncores (int): The number of cores that will be used during the calculation
         level_of_theory (str): The DFT level of theory (func/basis1/basis2/disp_corr)
         autode_folder (str): The overarching autodE folder in which the input files need to be stored
+        relaunch (bool): Whether the file is re-initialized or not
 
     Methods:
         determine_keywords: Determines and formats all the keywords necessary for the autodE calculation
@@ -175,6 +176,7 @@ class InputFile:
         n_cores: int = 16,
         level_of_theory: str = None,
         autode_folder: str = None,
+        relaunch: bool = False
     ):
 
         self.idx = idx
@@ -190,7 +192,10 @@ class InputFile:
             if len(level_of_theory.split("/")) == 4:
                 self.disp_corr = level_of_theory.split("/")[3]
 
-        self.file = open(f"{idx}.py", "w")
+        if relaunch == True:
+            self.file = open(f"r{idx}.py", "w") 
+        else:
+            self.file = open(f"{idx}.py", "w")
 
         self.initialize_input_file()
 
