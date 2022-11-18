@@ -24,7 +24,7 @@ parser.add_argument(
     "--complexes",
     dest="complexes",
     action="store_true",
-    help="whether extract energies of complexes need to be extracted",
+    help="whether energies of complexes need to be extracted",
 )
 
 
