@@ -87,7 +87,7 @@ python finalize_reaction_profiles.py --data-file <data set .csv file> --prelimin
 
 ## Final dataset
 
-The `.csv` file, containing the curated final dataset, can be found in the main directory (`output_reaction_profiles_finalized.csv`). The geometries and energies for each of the reactions can be found at xxx.
+The `.csv` file, containing the curated final dataset, as well as the geometries and energies for each of the reactions and benchmarking data (in `.zip`) format, can be found in the `final_data_files` directory.
 
 ## References
 
