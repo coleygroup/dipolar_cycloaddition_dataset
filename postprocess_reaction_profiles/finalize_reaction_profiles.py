@@ -182,7 +182,8 @@ def check_cyclization(xyz_original, xyz_alt):
 def get_rxn_smiles_and_targets(filename):
     """Read in the input .csv-file, rename rxn_id column and initialize the output columns"""
     df = pd.read_csv(filename)
-    df["rxn_id"] = df.index
+    if "rxn_id" not in df.columns:
+        df["rxn_id"] = df.index
 
     for output_column in ["E_r", "E_act", "H_r", "H_act", "G_r", "G_act"]:
         df[f"{output_column}"] = df["rxn_smiles"].apply(lambda x: None)
