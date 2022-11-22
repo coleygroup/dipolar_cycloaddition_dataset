@@ -571,7 +571,7 @@ def get_input_pool(df, home_dir, tmp_dir, geom_dir):
 
     dipole_smiles_list = df.dipole_smiles.values.tolist()
     product_smiles_list = df.product_smiles.values.tolist()
-    rxn_id_list = df.index.tolist()
+    rxn_id_list = df.rxn_id.tolist()
     home_dir_list = [home_dir for i in range(len(rxn_id_list))]
     tmp_dir_list = [tmp_dir for i in range(len(rxn_id_list))]
     geom_dir_list = [geom_dir for i in range(len(rxn_id_list))]
