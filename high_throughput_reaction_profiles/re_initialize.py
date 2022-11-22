@@ -85,7 +85,8 @@ if __name__ == "__main__":
 
     name = os.path.splitext(args.data_file)[0]
 
-    df_to_do.rename(columns={"index": "rxn_id"}, inplace=True)
+    if "rxn_id" not in df_to_do.columns:
+        df_to_do.rename(columns={"index": "rxn_id"}, inplace=True)
 
     df_to_do["data_point"] = df_to_do.apply(
         lambda x: ReactionDataPoint(

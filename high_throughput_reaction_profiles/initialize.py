@@ -60,7 +60,9 @@ if __name__ == "__main__":
         os.mkdir(args.autodE_folder)
 
     df = pd.read_csv(args.data_file)
-    df.rename(columns={"Unnamed: 0": "rxn_id"}, inplace=True)
+
+    if "rxn_id" not in df.columns:
+        df.rename(columns={"Unnamed: 0": "rxn_id"}, inplace=True)
 
     df["data_point"] = df.apply(
         lambda x: ReactionDataPoint(
