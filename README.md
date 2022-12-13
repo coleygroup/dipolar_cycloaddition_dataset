@@ -97,8 +97,18 @@ The `.csv` file, containing the curated final dataset, as well as the geometries
 ## References
 
 If (parts of) this workflow are used as part of a publication please cite the associated paper:
-
-xxx
+```
+@misc{https://doi.org/10.48550/arxiv.2212.06014,
+  doi = {10.48550/ARXIV.2212.06014},
+  url = {https://arxiv.org/abs/2212.06014},
+  author = {Stuyver, Thijs and Jorner, Kjell and Coley, Connor},
+  keywords = {Chemical Physics (physics.chem-ph), FOS: Physical sciences, FOS: Physical sciences},
+  title = {Reaction profiles for quantum chemistry-computed [3 + 2] cycloaddition reactions},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {Creative Commons Attribution Non Commercial No Derivatives 4.0 International}
+}
+```
 
 Additionally, since the workflow makes heavy use of autodE, please also cite the paper in which this code was originally presented:
 ```
